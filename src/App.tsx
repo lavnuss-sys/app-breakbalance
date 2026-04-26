@@ -123,68 +123,96 @@ export default function App() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen w-full flex flex-col items-center justify-center p-8 bg-[#1A1A1A] text-white relative overflow-hidden"
+      className="fixed inset-0 w-full h-full bg-[#FFFEF9] overflow-hidden flex justify-center font-body"
     >
-      {/* Playful Blob Character (Inspired by Image 1) */}
-      <motion.div 
-        animate={{ 
-          y: [0, -20, 0],
-          scale: [1, 1.05, 1]
-        }}
-        transition={{ 
-          duration: 4, 
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="absolute bottom-[-10%] right-[-10%] w-[300px] h-[300px] bg-[#8DB654] rounded-full flex items-center justify-center"
-      >
-        <div className="relative w-full h-full">
-           <div className="absolute top-[40%] left-[30%] w-4 h-4 bg-black rounded-full shadow-[60px_0_0_0_black]"></div>
-           <motion.div 
-             animate={{ scaleY: [1, 0.5, 1] }}
-             transition={{ duration: 0.2, repeat: Infinity, repeatDelay: 3 }}
-             className="absolute top-[55%] left-[45%] w-8 h-4 border-b-4 border-black rounded-full"
-           ></motion.div>
-        </div>
-      </motion.div>
-
-      <div className="z-10 w-full max-w-md">
-        <motion.div
-           initial={{ y: 50, opacity: 0 }}
-           animate={{ y: 0, opacity: 1 }}
-           transition={{ delay: 0.2 }}
-        >
-          <h1 className="text-6xl font-bold leading-none mb-4 lowercase tracking-tight font-title">
-            pure<br />
-            <span className="text-[#8DB654]">pause</span>
-          </h1>
-          <p className="text-xl font-medium text-slate-400 mb-12 font-body">
-            "Cuida tu tiempo, cuida tu cuerpo"
-          </p>
-
-          <div className="space-y-4">
-             <button 
-               onClick={handleLogin}
-               className="w-full bg-[#8DB654] hover:bg-[#7a9d4a] text-black font-black py-6 rounded-3xl text-xl transition-all active:scale-95 flex items-center justify-center gap-3"
-             >
-               INICIAR SESIÓN
-             </button>
-             <button 
-               className="w-full bg-white/10 hover:bg-white/20 text-white font-black py-6 rounded-3xl text-xl transition-all active:scale-95"
-             >
-               CREAR CUENTA
-             </button>
+      <div className="relative w-full h-[844px] max-w-[390px] mx-auto overflow-hidden">
+        
+        {/* Title Area */}
+        <div className="absolute top-[26%] left-0 right-0 flex flex-col items-center z-10">
+          <div className="relative inline-block w-fit mr-4">
+            {/* Top Right Sparkle */}
+            <svg className="absolute -top-4 -right-1 w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" fill="#FDE278"/>
+            </svg>
+            {/* Bottom Left Sparkle */}
+            <svg className="absolute -bottom-8 -left-5 w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" fill="#FDE278"/>
+            </svg>
+            
+            <h1 className="text-[52px] font-black leading-none tracking-tight font-title text-[#353A26]">
+              PurePause
+            </h1>
           </div>
+          <p className="text-[#353A26] text-[13px] mt-1 mb-2 font-medium tracking-wide">
+            Cuida tu tiempo, cuida tu cuerpo
+          </p>
+        </div>
+
+        {/* Clouds */}
+        <div className="absolute top-[34%] right-[-14%] w-[280px] h-[280px] z-0">
+          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+            <defs>
+              <radialGradient id="yellow-grad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#FBBC36" />
+                <stop offset="100%" stopColor="#FDE278" />
+              </radialGradient>
+            </defs>
+            <path d="M100 20 C140 20 150 40 170 50 C190 60 190 100 180 120 C170 140 150 170 120 180 C90 190 60 180 40 160 C20 140 10 110 20 80 C30 50 60 40 80 40 C90 30 90 20 100 20 Z" fill="url(#yellow-grad)" opacity="0.95"/>
+          </svg>
+        </div>
+
+        <div className="absolute top-[48%] left-[-16%] w-[260px] h-[260px] z-0">
+          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+            <defs>
+              <radialGradient id="green-grad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#A5C45B" />
+                <stop offset="100%" stopColor="#C9E190" />
+              </radialGradient>
+            </defs>
+            <path d="M110 20 C140 20 160 40 170 70 C180 100 170 130 150 150 C130 170 100 180 70 170 C40 160 20 140 10 110 C0 80 20 50 50 40 C70 30 90 20 110 20 Z" fill="url(#green-grad)" opacity="0.95"/>
+          </svg>
+        </div>
+
+        {/* Buttons */}
+        <div className="absolute top-[44%] left-0 w-full flex flex-col items-center gap-4 z-20">
+           <button 
+             onClick={handleLogin}
+             className="w-[208px] h-[48px] bg-[#BAD66C] hover:bg-[#aecd5a] text-[#2C311D] font-medium rounded-xl text-lg shadow-none flex items-center justify-center transition-colors"
+           >
+             Iniciar sesión
+           </button>
+           <button 
+             className="w-[208px] h-[48px] bg-[#FDE278] hover:bg-[#ebd069] text-[#2C311D] font-medium rounded-xl text-lg shadow-none flex items-center justify-center transition-colors"
+           >
+             Crear cuenta
+           </button>
+        </div>
+
+        {/* Mascot */}
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, type: "spring", stiffness: 100 }}
+          className="absolute bottom-[-15%] right-[-10%] w-[330px] h-[330px] pointer-events-none z-10"
+        >
+          <svg viewBox="0 0 350 350" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+            {/* Left Arm */}
+            <path d="M 150 270 Q 110 250 80 220 Q 70 210 80 200 Q 100 190 110 210 Q 115 190 130 200 Q 140 210 140 220 Q 145 200 160 210 Q 170 220 165 240 Z" fill="white" stroke="#2C311D" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+            {/* Legs */}
+            <path d="M 140 270 Q 120 310 90 320 Q 80 330 100 340 Q 140 350 160 310 Q 170 290 160 270 Z" fill="white" stroke="#2C311D" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M 210 270 Q 220 310 250 320 Q 260 330 240 340 Q 200 350 180 310 Q 170 290 180 270 Z" fill="white" stroke="#2C311D" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+            
+            {/* Fluffy Body */}
+            <path d="M 150 50 Q 170 30 190 50 Q 210 40 220 60 Q 250 50 250 80 Q 280 80 270 110 Q 300 120 280 150 Q 310 170 280 190 Q 300 220 270 230 Q 280 260 250 260 Q 250 290 220 270 Q 200 300 180 280 Q 150 310 130 280 Q 110 300 90 270 Q 60 290 60 260 Q 30 260 40 230 Q 10 220 30 190 Q 0 170 30 150 Q 10 120 40 110 Q 30 80 60 80 Q 60 50 90 60 Q 100 30 120 50 Q 130 30 150 50 Z" fill="#FDE278" />
+            
+            {/* Eyes */}
+            <circle cx="160" cy="180" r="22" fill="white" />
+            <circle cx="160" cy="180" r="14" fill="#2C311D" />
+            <circle cx="230" cy="180" r="22" fill="white" />
+            <circle cx="230" cy="180" r="14" fill="#2C311D" />
+          </svg>
         </motion.div>
 
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-12 p-6 bg-white rounded-[40px] text-black flex items-center gap-4"
-        >
-          <div className="text-sm font-bold">¡SE SIENTE MEJOR JUNTOS!</div>
-        </motion.div>
       </div>
     </motion.div>
   );

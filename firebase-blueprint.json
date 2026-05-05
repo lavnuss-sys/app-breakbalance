@@ -15,6 +15,7 @@
         "pet_points": { "type": "integer" },
         "pet_equipped": { "type": "string" },
         "pet_purchased": { "type": "array", "items": { "type": "string" } },
+        "accessoryOffsets": { "type": "object" },
         "stats": {
           "type": "object",
           "properties": {

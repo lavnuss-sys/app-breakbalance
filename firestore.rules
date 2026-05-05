@@ -28,6 +28,7 @@ service cloud.firestore {
         && data.pet_points is int && data.pet_points >= 0
         && data.pet_equipped is string && data.pet_equipped.size() <= 100
         && data.pet_purchased is list && data.pet_purchased.size() <= 100
+        && (!('accessoryOffsets' in data) || (data.accessoryOffsets is map))
         && data.stats is map
         && data.stats.keys().hasAll(['activeBreaks', 'activities', 'sessionsThisWeek', 'waterWeek', 'waterToday'])
         && data.stats.activeBreaks is int && data.stats.activeBreaks >= 0
@@ -44,7 +45,7 @@ service cloud.firestore {
       allow create: if isSignedIn() 
         && isValidId(userId) 
         && request.auth.uid == userId
-        && incoming().keys().hasOnly(['uid', 'name', 'height', 'weight', 'activityLevel', 'goal', 'appStatus', 'pet_points', 'pet_equipped', 'pet_purchased', 'stats', 'createdAt', 'updatedAt'])
+        && incoming().keys().hasOnly(['uid', 'name', 'height', 'weight', 'activityLevel', 'goal', 'appStatus', 'pet_points', 'pet_equipped', 'pet_purchased', 'accessoryOffsets', 'stats', 'createdAt', 'updatedAt'])
         && incoming().createdAt == request.time
         && incoming().updatedAt == request.time
         && isValidUserConfig(incoming());
@@ -57,7 +58,7 @@ service cloud.firestore {
         && incoming().updatedAt == request.time
         && isValidUserConfig(incoming())
         && (
-          incoming().diff(existing()).affectedKeys().hasOnly(['name', 'height', 'weight', 'activityLevel', 'goal', 'appStatus', 'pet_points', 'pet_equipped', 'pet_purchased', 'stats', 'updatedAt'])
+          incoming().diff(existing()).affectedKeys().hasOnly(['name', 'height', 'weight', 'activityLevel', 'goal', 'appStatus', 'pet_points', 'pet_equipped', 'pet_purchased', 'accessoryOffsets', 'stats', 'updatedAt'])
         );
         
       allow delete: if false;

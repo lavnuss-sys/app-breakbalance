@@ -84,8 +84,9 @@ export function useAuth() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error signing in with Google', error);
+      alert(`Error al iniciar sesión: ${error.message || 'Verifica que el dominio de Vercel esté autorizado en Firebase.'}`);
     }
   };
 

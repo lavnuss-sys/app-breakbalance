@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    function isValidUserConfig(data) {
+      return data.keys().hasAll(['uid', 'name', 'appStatus', 'pet_points', 'pet_equipped', 'pet_purchased', 'stats'])
+        && data.uid is string && data.uid.size() <= 128 && data.uid == request.auth.uid
+        && data.name is string && data.name.size() <= 100
+        && (!('height' in data) || (data.height is string && data.height.size() <= 10))
+        && (!('weight' in data) || (data.weight is string && data.weight.size() <= 10))
+        && (!('activityLevel' in data) || (data.activityLevel is string && data.activityLevel.size() <= 50))
+        && (!('goal' in data) || (data.goal is string && data.goal.size() <= 50))
+        && data.appStatus in ['welcome', 'onboarding', 'dashboard']
+        && data.pet_points is int && data.pet_points >= 0
+        && data.pet_equipped is string && data.pet_equipped.size() <= 100
+        && data.pet_purchased is list && data.pet_purchased.size() <= 100
+        && data.stats is map
+        && data.stats.keys().hasAll(['activeBreaks', 'activities', 'sessionsThisWeek', 'waterWeek', 'waterToday'])
+        && data.stats.activeBreaks is int && data.stats.activeBreaks >= 0
+        && data.stats.activities is int && data.stats.activities >= 0
+        && data.stats.sessionsThisWeek is int && data.stats.sessionsThisWeek >= 0
+        && data.stats.waterWeek is int && data.stats.waterWeek >= 0
+        && data.stats.waterToday is int && data.stats.waterToday >= 0;
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+      allow list: if false; // No list
+      
+      allow create: if isSignedIn() 
+        && isValidId(userId) 
+        && request.auth.uid == userId
+        && incoming().keys().hasOnly(['uid', 'name', 'height', 'weight', 'activityLevel', 'goal', 'appStatus', 'pet_points', 'pet_equipped', 'pet_purchased', 'stats', 'createdAt', 'updatedAt'])
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && isValidUserConfig(incoming());
+
+      allow update: if isSignedIn()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && isValidUserConfig(incoming())
+        && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['name', 'height', 'weight', 'activityLevel', 'goal', 'appStatus', 'pet_points', 'pet_equipped', 'pet_purchased', 'stats', 'updatedAt'])
+        );
+        
+      allow delete: if false;
+    }
+  }
+}

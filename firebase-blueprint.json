@@ -1,0 +1,40 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User's complete data including profile, stats, and pet info.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "height": { "type": "string" },
+        "weight": { "type": "string" },
+        "activityLevel": { "type": "string" },
+        "goal": { "type": "string" },
+        "appStatus": { "type": "string", "enum": ["welcome", "onboarding", "dashboard"] },
+        "pet_points": { "type": "integer" },
+        "pet_equipped": { "type": "string" },
+        "pet_purchased": { "type": "array", "items": { "type": "string" } },
+        "stats": {
+          "type": "object",
+          "properties": {
+             "activeBreaks": { "type": "integer" },
+             "activities": { "type": "integer" },
+             "sessionsThisWeek": { "type": "integer" },
+             "waterWeek": { "type": "integer" },
+             "waterToday": { "type": "integer" }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "appStatus", "pet_points", "pet_equipped", "pet_purchased", "stats", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Stores user data, settings, and pet information."
+    }
+  }
+}

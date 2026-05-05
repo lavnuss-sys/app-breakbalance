@@ -5,3 +5,16 @@
   --font-body: "Poppins", sans-serif;
   --font-title: "Outfit", sans-serif;
 }
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  .dark input[type="number"]::-webkit-inner-spin-button,
+  .dark input[type="number"]::-webkit-outer-spin-button {
+    background-color: transparent;
+    opacity: 1;
+    cursor: pointer;
+    /* Attempt to colorize the arrow icon to match #BAD66C using filter */
+    filter: invert(75%) sepia(55%) saturate(400%) hue-rotate(35deg) brightness(150%);
+  }
+}

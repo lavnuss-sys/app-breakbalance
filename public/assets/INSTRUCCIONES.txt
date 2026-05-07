@@ -1,0 +1,1 @@
+This folder is for standard assets. Upload the corresponding SVG files here.

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Activity, Play, Square, Accessibility, PersonStanding, Footprints, Clock, Droplets, Home, Calendar, User, ChevronLeft, BarChart3, Mail, Lock, UserPlus, LogOut, Settings, Award, Info, Minus, Plus, Hand, X, Cat, Coins, Store, HelpCircle, Eye, Wind, RefreshCw } from 'lucide-react';
+import { Activity, Play, Square, Accessibility, PersonStanding, Footprints, Clock, Droplets, Home, Calendar, User, ChevronLeft, BarChart3, Mail, Lock, UserPlus, LogOut, Settings, Award, Info, Minus, Plus, Hand, X, Cat, Coins, Store, HelpCircle, Eye, Wind, RefreshCw, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useAuth } from './useAuth';
@@ -53,6 +53,8 @@ export default function App() {
   const [activeAlert, setActiveAlert] = useState<AlertType>('none');
   const [sessionCompleteData, setSessionCompleteData] = useState<{points: number} | null>(null);
   const [waterToday, setWaterToday] = useState(5);
+  const [streak, setStreak] = useState(0);
+  const [lastActivityDate, setLastActivityDate] = useState('');
   const [showWaterInfo, setShowWaterInfo] = useState(false);
   const [showPointsInfo, setShowPointsInfo] = useState(false);
   const [waterPointsMessage, setWaterPointsMessage] = useState<{title: string, message: string, points: number} | null>(null);
@@ -83,12 +85,15 @@ export default function App() {
         dailyActivity: userData.stats.dailyActivity || [0, 0, 0, 0, 0, 0, 0]
       });
       setWaterToday(userData.stats.waterToday || 0);
+      setStreak(userData.streak || 0);
+      setLastActivityDate(userData.lastActivityDate || '');
       setLocalOffsets(userData.accessoryOffsets || {});
       setUser(prev => ({
         ...prev,
         name: userData.name,
         email: authUser.email || '',
-        avatar: authUser.photoURL || ''
+        avatar: authUser.photoURL || '',
+        streak: userData.streak || 0
       }));
       setHasLoaded(true);
     } else if (!loading && !authUser) {
@@ -128,19 +133,116 @@ export default function App() {
     }
   }, [appStatus]);
 
+  useEffect(() => {
+    if (authUser) {
+      updateUserData({ streak });
+      setUser(prev => ({ ...prev, streak }));
+    }
+  }, [streak]);
+
+  useEffect(() => {
+    if (authUser) {
+      updateUserData({ lastActivityDate });
+    }
+  }, [lastActivityDate]);
+
+  // Streak logic helper
+  const triggerStreakUpdate = () => {
+    const today = new Date().toISOString().split('T')[0];
+    if (lastActivityDate === today) return;
+
+    const lastDateObj = lastActivityDate ? new Date(lastActivityDate + 'T00:00:00') : null;
+    const todayObj = new Date(today + 'T00:00:00');
+
+    let newStreak = 1;
+    if (lastDateObj) {
+      const diffTime = todayObj.getTime() - lastDateObj.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 1) {
+        newStreak = streak + 1;
+      } else if (diffDays === 0) {
+        return; // Already updated today
+      }
+    }
+
+    setStreak(newStreak);
+    setLastActivityDate(today);
+  };
+
+  // Check for streak reset/update on app entry
+  useEffect(() => {
+    if (hasLoaded && authUser) {
+      const today = new Date().toISOString().split('T')[0];
+      const lastDate = lastActivityDate;
+      
+      if (lastDate && lastDate !== today) {
+        const lastDateObj = new Date(lastDate + 'T00:00:00');
+        const todayObj = new Date(today + 'T00:00:00');
+        const diffTime = todayObj.getTime() - lastDateObj.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays > 1) {
+          setStreak(0); // Reset if missed more than 1 day
+          // Note: triggerStreakUpdate will set it to 1 when an action happens or right now if we want "login" to count.
+          // The user said "Entra a la aplicación" counts as an action.
+        }
+      }
+      
+      // Auto-trigger on entry as per "Entra a la aplicación"
+      triggerStreakUpdate();
+    }
+  }, [hasLoaded]);
+
   // Mock user data
   const [user, setUser] = useState({
     name: 'George',
     email: 'george.wellness@example.com',
     avatar: 'https://picsum.photos/seed/george/200',
-    streak: 5,
-    rank: 'Wellness Ninja'
+    streak: 0,
+    rank: 'Semilla'
   });
 
   // Settings State
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [tempName, setTempName] = useState(user.name);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [tempIsDarkMode, setTempIsDarkMode] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setIsInstallable(false);
+    }
+    setDeferredPrompt(null);
+  };
+
+  const getRank = (activities: number) => {
+    if (activities <= 3) return 'Semilla';
+    if (activities <= 10) return 'Brote';
+    if (activities <= 20) return 'Germinando';
+    if (activities <= 35) return 'Tallo Firme';
+    if (activities <= 50) return 'Capullo';
+    return 'Floración';
+  };
 
   // State for user statistics
   const [stats, setStats] = useState({
@@ -160,16 +262,24 @@ export default function App() {
 
   // Calculate Health Score (0-10)
   const healthScore = React.useMemo(() => {
-    // 1. Sessions: Goal 21/week (50% weight -> max 5 pts)
-    const sessionScore = Math.min(5, (stats.sessionsThisWeek / 21) * 5);
+    // 1. Sessions: Goal 10/week (50% weight -> max 5 pts)
+    const sessionScore = Math.min(5, (stats.sessionsThisWeek / 10) * 5);
     
-    // 2. Water: Goal 56/week (30% weight -> max 3 pts)
-    const waterScore = Math.min(3, (stats.waterWeek / 56) * 3);
+    // 2. Water: Goal 40/week (30% weight -> max 3 pts)
+    const waterScore = Math.min(3, (stats.waterWeek / 40) * 3);
     
     // 3. Active Breaks: Goal 14/week (20% weight -> max 2 pts)
     const breakScore = Math.min(2, (stats.activeBreaks / 14) * 2);
     
     return Math.round(sessionScore + waterScore + breakScore);
+  }, [stats]);
+
+  const consistencyPercentage = React.useMemo(() => {
+    const sessionScore = (stats.sessionsThisWeek / 10) * 5;
+    const waterScore = (stats.waterWeek / 40) * 3;
+    const breakScore = (stats.activeBreaks / 14) * 2;
+    const total = sessionScore + waterScore + breakScore;
+    return Math.min(100, Math.round((total / 10) * 100));
   }, [stats]);
 
   const daysLabels = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'];
@@ -213,6 +323,7 @@ export default function App() {
             const pointsEarned = Math.min(150, (minutesCompleted * 2) + 15);
             setPoints(p => p + pointsEarned);
             setSessionCompleteData({ points: pointsEarned });
+            triggerStreakUpdate();
 
             return 0;
           }
@@ -489,8 +600,10 @@ export default function App() {
               <Activity size={14} className="text-white dark:text-[#2C311D]" />
             </div>
 
-            <div className="flex flex-col items-center z-10">
-              <span className="text-7xl font-bold tracking-tighter mb-1 text-[#353A26] dark:text-[#FFFEF9] font-title">{formatTime(timeRemaining)}</span>
+            <div className="flex flex-col items-center z-10 px-4">
+              <span className={`${timeRemaining >= 3600 ? 'text-5xl md:text-6xl' : 'text-7xl'} font-bold tracking-tighter mb-1 text-[#353A26] dark:text-[#FFFEF9] font-title transition-all duration-300`}>
+                {formatTime(timeRemaining)}
+              </span>
               <p className="text-[#353A26] dark:text-[#FFFEF9] font-medium text-sm">tiempo restante</p>
             </div>
           </div>
@@ -547,7 +660,7 @@ export default function App() {
         </div>
 
         <p className="text-sm text-[#353A26] dark:text-[#FFFEF9] mb-8 leading-relaxed">
-          Esta semana has mantenido una constancia del <span className="font-bold text-[#BAD66C]">85%</span>. Tus niveles de energía son óptimos durante las mañanas.
+          Esta semana has mantenido una constancia del <span className="font-bold text-[#BAD66C]">{consistencyPercentage}%</span>. Tus niveles de energía son óptimos durante las mañanas.
         </p>
 
         <div className="w-full h-64 -ml-4">
@@ -760,6 +873,7 @@ export default function App() {
                       waterWeek: Math.max(0, prev.waterWeek + finalChange),
                       waterMonth: Math.max(0, prev.waterMonth + finalChange)
                     }));
+                    triggerStreakUpdate();
                     setIsWaterModalOpen(false);
                   }}
                   className="w-full bg-[#BAD66C] text-[#2C311D] font-bold py-4 rounded-2xl active:scale-95 transition-transform"
@@ -1162,7 +1276,7 @@ export default function App() {
       className="w-full font-body"
     >
       <h1 className="text-4xl font-bold mb-2 font-title text-[#353A26] dark:text-[#FFFEF9]">Mi Perfil</h1>
-      <p className="text-slate-500 dark:text-slate-400 mb-8">Información de tu bienestar</p>
+      <p className="text-slate-500 dark:text-slate-400 mb-8">Información de tu cuenta</p>
 
       <div className="space-y-6">
         {/* Profile Card */}
@@ -1176,7 +1290,7 @@ export default function App() {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-[#353A26] dark:text-[#FFFEF9] font-title">{user.name}</h2>
-              <p className="text-sm text-[#353A26] dark:text-[#FFFEF9] font-medium font-body">{user.rank}</p>
+              <p className="text-sm text-[#353A26] dark:text-[#FFFEF9] font-medium font-body">{getRank(stats.activities)}</p>
             </div>
           </div>
 
@@ -1184,7 +1298,7 @@ export default function App() {
              <div className="p-4 bg-[#FFFEF9] dark:bg-[#1A1C14] rounded-2xl border border-[#E2F0BD] dark:border-[#4A5333]">
                 <p className="text-xs font-bold text-[#353A26] dark:text-[#FFFEF9] uppercase tracking-tight mb-1">Racha</p>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl font-bold text-[#353A26] dark:text-[#FFFEF9]">{user.streak} días</span>
+                  <span className="text-xl font-bold text-[#353A26] dark:text-[#FFFEF9]">{streak} días</span>
                 </div>
              </div>
           </div>
@@ -1196,6 +1310,7 @@ export default function App() {
            <button 
               onClick={() => {
                 setTempName(user.name);
+                setTempIsDarkMode(isDarkMode);
                 setIsSettingsOpen(true);
               }}
               className="w-full p-4 flex items-center justify-between hover:bg-[#BAD66C]/5 rounded-2xl transition-colors"
@@ -1206,6 +1321,19 @@ export default function App() {
               </div>
               <ChevronLeft size={18} className="rotate-180 text-[#353A26] dark:text-[#FFFEF9]" />
            </button>
+
+           {isInstallable && (
+              <button 
+                 onClick={handleInstallClick}
+                 className="w-full p-4 flex items-center justify-between hover:bg-[#BAD66C]/5 rounded-2xl transition-colors mt-2"
+              >
+                 <div className="flex items-center gap-3">
+                    <Download size={20} className="text-[#353A26] dark:text-[#FFFEF9]" />
+                    <span className="font-bold text-[#353A26] dark:text-[#FFFEF9]">Instalar Aplicación</span>
+                 </div>
+                 <ChevronLeft size={18} className="rotate-180 text-[#353A26] dark:text-[#FFFEF9]" />
+              </button>
+           )}
            <button 
               onClick={() => {
                 signOut();
@@ -1556,14 +1684,14 @@ export default function App() {
               <div className="mb-8 p-4 bg-white dark:bg-[#2C311D] rounded-2xl border border-[#E2F0BD] dark:border-[#4A5333] flex items-center justify-between">
                  <span className="font-bold text-[#353A26] dark:text-[#FFFEF9]">Modo Oscuro</span>
                  <button 
-                  onClick={() => setIsDarkMode(!isDarkMode)}
-                  className={`w-14 h-8 rounded-full p-1 transition-colors ${isDarkMode ? 'bg-[#BAD66C]' : 'bg-slate-200'}`}
+                  onClick={() => setTempIsDarkMode(!tempIsDarkMode)}
+                  className={`w-14 h-8 rounded-full p-1 transition-colors ${tempIsDarkMode ? 'bg-[#BAD66C]' : 'bg-slate-200'}`}
                  >
                     <motion.div 
                       layout
                       className="w-6 h-6 bg-white dark:bg-[#2C311D] rounded-full shadow-sm"
                       transition={{ type: 'spring', stiffness: 700, damping: 30 }}
-                      style={{ marginLeft: isDarkMode ? '24px' : '0px' }}
+                      style={{ marginLeft: tempIsDarkMode ? '24px' : '0px' }}
                     />
                  </button>
               </div>
@@ -1577,6 +1705,7 @@ export default function App() {
                         updateUserData({ name: tempName.trim() });
                       }
                     }
+                    setIsDarkMode(tempIsDarkMode);
                     setIsSettingsOpen(false);
                   }}
                   className="w-full bg-[#353A26] dark:bg-[#BAD66C] text-white dark:text-[#2C311D] font-bold py-4 rounded-2xl active:scale-95 transition-transform"

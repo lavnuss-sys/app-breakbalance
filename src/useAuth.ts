@@ -10,6 +10,8 @@ export interface UserData {
   pet_points: number;
   pet_equipped: string;
   pet_purchased: string[];
+  streak: number;
+  lastActivityDate?: string; // YYYY-MM-DD
   accessoryOffsets?: Record<string, { top: number, left: number, scale: number }>;
   stats: {
     activeBreaks: number;
@@ -57,6 +59,8 @@ export function useAuth() {
               pet_points: 150,
               pet_equipped: '',
               pet_purchased: [],
+              streak: 0,
+              lastActivityDate: '',
               stats: defaultStats,
             };
             

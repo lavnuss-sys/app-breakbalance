@@ -3,6 +3,7 @@ const URLS_TO_CACHE = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/assets/Timypurepause.png',
   '/assets/timyreposo.svg',
   '/assets/timysaludo.svg',
   '/assets/timyfeliz.svg',

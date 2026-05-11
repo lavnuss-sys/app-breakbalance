@@ -395,7 +395,7 @@ export default function App() {
           transition={{ delay: 0.3, type: "spring", stiffness: 100 }}
           className="absolute bottom-[-20px] right-[-20px] w-[300px] h-[300px] pointer-events-none z-20"
         >
-          <img src="/assets/timyizquierda.svg" alt="Timy" className="w-full h-full object-contain" />
+          <img src={isDarkMode ? "./assets2/tizquierdoblan.svg" : "./assets/timyizquierda.svg"} alt="Timy" className="w-full h-full object-contain" />
         </motion.div>
 
       </div>
@@ -593,7 +593,7 @@ export default function App() {
       {/* Mascot Session Counter */}
       <div className="bg-[#BAD66C]/10 rounded-[40px] p-8 border border-[#BAD66C]/20 flex flex-row items-center gap-6 relative overflow-hidden mb-8">
         <div className="w-24 h-24 relative z-10 flex-shrink-0 flex justify-center items-center">
-          <img src={isDarkMode ? "/assets2/timyderecha.svg" : "/assets/timyderecha.svg"} alt="Timy" className="w-full h-full object-contain scale-125" />
+          <img src={isDarkMode ? "./assets2/tderechoblanco.svg" : "./assets/timyderecha.svg"} alt="Timy" className="w-full h-full object-contain scale-125" />
         </div>
         <div className="text-left relative z-10 flex-1">
           <p className="text-[#353A26] dark:text-[#FFFEF9] font-bold text-lg mb-1 leading-tight">
@@ -815,7 +815,7 @@ export default function App() {
                 >
                   {/* Small Mascot in Corner */}
                   <div className="absolute -top-6 right-2 w-24 h-24 drop-shadow-lg flex justify-center items-center">
-                    <img src={isDarkMode ? "/assets/tfelizblanco.svg" : "/assets/timyfeliz.svg"} alt="Timy Feliz" className="w-full h-full object-contain" />
+                    <img src={isDarkMode ? "./assets2/tfelizblanco.svg" : "./assets/timyfeliz.svg"} alt="Timy Feliz" className="w-full h-full object-contain" />
                   </div>
 
                   <h3 className="text-lg font-black text-[#353A26] dark:text-[#FFFEF9] mb-2 font-title">Sabías que...</h3>
@@ -980,7 +980,7 @@ export default function App() {
       <div className="bg-[#FFFEF9] dark:bg-[#1A1C14] rounded-[32px] p-8 border border-[#E2F0BD] dark:border-[#4A5333] shadow-sm mb-6 flex flex-col items-center relative overflow-hidden text-center">
         {/* Mascot representation */}
         <div className="relative w-[80%] aspect-square flex items-center justify-center mb-4 mx-auto">
-            <img src={isDarkMode ? "/assets2/treposoblanco.svg" : "/assets/timyreposo.svg"} alt="Timy" className="w-full h-full object-contain drop-shadow-md" />
+            <img src={isDarkMode ? "./assets2/treposoblanco.svg" : "./assets/timyreposo.svg"} alt="Timy" className="w-full h-full object-contain drop-shadow-md" />
 
             {/* Accessories */}
             {equippedAccessory && (
@@ -1240,7 +1240,7 @@ export default function App() {
             <h2 className="text-3xl font-black text-[#353A26] dark:text-[#FFFEF9] font-title leading-tight text-left">
               ¡Hola! <br/>Soy Timy
             </h2>
-            <img src="/assets/timysaludo.svg" alt="Timy" className="w-[140px] h-[140px] shrink-0 object-contain drop-shadow-md" />
+            <img src={isDarkMode ? "./assets2/tsaludoblanco.svg" : "./assets/timysaludo.svg"} alt="Timy" className="w-[140px] h-[140px] shrink-0 object-contain drop-shadow-md" />
           </div>
           
           <div className="text-left">

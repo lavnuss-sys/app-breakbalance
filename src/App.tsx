@@ -177,6 +177,9 @@ export default function App() {
       const lastDate = lastActivityDate;
       
       if (lastDate && lastDate !== today) {
+        // Reset daily indicators since a new day has started
+        setWaterToday(0);
+
         const lastDateObj = new Date(lastDate + 'T00:00:00');
         const todayObj = new Date(today + 'T00:00:00');
         const diffTime = todayObj.getTime() - lastDateObj.getTime();

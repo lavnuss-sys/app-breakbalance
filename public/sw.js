@@ -1,9 +1,10 @@
-const CACHE_NAME = 'purepause-cache-v2';
+const CACHE_NAME = 'purepause-cache-v3';
 const OFFLINE_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/assets/Timypurepause.png',
+  '/assets/icon-192.png',
+  '/assets/icon-512.png',
   '/assets/timyreposo.svg',
   '/assets/timysaludo.svg',
   '/assets/timyfeliz.svg',

@@ -1350,6 +1350,11 @@ export default function App() {
               </div>
            </button>
         </div>
+
+        <div className="text-center mt-6 text-xs text-[#353A26]/60 dark:text-[#FFFEF9]/60">
+           <p className="font-medium">Realizado por Laura Pabon</p>
+           <p className="text-[11px] mt-0.5 font-mono">@larusm</p>
+        </div>
       </div>
     </motion.div>
   );
